@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -10,12 +11,19 @@ import {
   Package2,
   Search,
   ShoppingCart,
-  UserRound,
-  UserRoundIcon,
 } from "lucide-react";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
+import { logout } from "@/store/slices/usersSlice";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const Navbar = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { user } = useAppSelector((state) => state.root.users);
+
+  // const { id, username, isLoggedIn } = user;
+
   return (
     <div className="bg-white h-full flex justify-center items-center flex-wrap w-full py-8 relative top-0">
       <div className="flex items-center justify-between flex-wrap gap-8 fixed">
@@ -38,6 +46,7 @@ const Navbar = () => {
           <Button
             variant="ghost"
             className="hover:bg-blue-700 hover:text-white flex gap-2"
+            onClick={() => {}}
           >
             <CircleUserRound />
             <span>Login</span>

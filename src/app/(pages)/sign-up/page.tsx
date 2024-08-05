@@ -16,15 +16,15 @@ import { z } from "zod";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useDispatch } from "react-redux";
 import { useToast } from "@/components/ui/use-toast";
-import { registerUser } from "@/store/slices/usersSlice";
 import { useRouter } from "next/navigation";
+import { registerUser } from "@/store/slices/usersSlice";
+import { useAppDispatch } from "@/store/hooks";
 
 const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const router = useRouter();
 

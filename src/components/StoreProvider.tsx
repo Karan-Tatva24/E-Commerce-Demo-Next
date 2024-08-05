@@ -1,17 +1,16 @@
 "use client";
 
-import { persistor, store } from "@/store/store";
+import React, { useMemo } from "react";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
+import { store } from "@/store/store";
 
-const StoreProvider = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Provider store={store}>
-      <PersistGate loading={<span>Loading...</span>} persistor={persistor}>
-        {children}
-      </PersistGate>
-    </Provider>
-  );
-};
+export default function StoreProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Memoize the store to ensure it is created only once
+  const storeInstance = useMemo(() => store, []);
 
-export default StoreProvider;
+  return <Provider store={storeInstance}>{children}</Provider>;
+}

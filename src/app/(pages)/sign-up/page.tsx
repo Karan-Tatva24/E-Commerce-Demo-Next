@@ -56,13 +56,13 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-600">
+    <div className="flex justify-center items-center min-h-full mt-8">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Welcome To Flipkart
+            Welcome To DemoKart
           </h1>
-          <p className="mb-4">Sign up to become a flipkart member</p>
+          <p className="mb-4">Sign up to become a demokart member</p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

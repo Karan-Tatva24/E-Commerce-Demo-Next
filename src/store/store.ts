@@ -7,6 +7,7 @@ import { rootReducer } from "./slices";
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
   key: "root",
   storage,
+  blacklist: ["products"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -2,68 +2,111 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import Logo from "../../public/Images/logo.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronDown,
-  CircleUserRound,
-  Package2,
-  Search,
-  ShoppingCart,
-} from "lucide-react";
-import { DotsVerticalIcon } from "@radix-ui/react-icons";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PackageIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/usersSlice";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const Navbar = () => {
-  const dispatch = useAppDispatch();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.root.users);
 
-  // const { id, username, isLoggedIn } = user;
+  const handleLogout = () => {
+    dispatch(logout({ id: user.id }));
+    router.push("/sign-in");
+  };
 
   return (
-    <div className="bg-white h-full flex justify-center items-center flex-wrap w-full py-8 relative top-0">
-      <div className="flex items-center justify-between flex-wrap gap-8 fixed">
-        <div>
-          <Link href="/">
-            <Image src={Logo} alt="logo" width={150} />
-          </Link>
-        </div>
-        <div className="hidden sm:block">
-          <div className="relative ml-auto flex-1 md:grow-0">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search For Products"
-              className="w-full rounded-lg bg-background pl-8 md:w-[500px] lg:w-[700px] bg-blue-100"
-            />
+    <div className="flex flex-col min-w-full">
+      <header className="border-b">
+        <div className="container flex items-center justify-between py-2 px-4 md:py-4 md:px-6">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2" prefetch={false}>
+              <PackageIcon className="h-6 w-6" />
+              <span className="font-semibold">DemoKart Inc.</span>
+            </Link>
+          </div>
+          <nav className="hidden md:flex items-center gap-4">
+            <Link
+              href="/"
+              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              prefetch={false}
+            >
+              Home
+            </Link>
+            <Link
+              href="#"
+              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              prefetch={false}
+            >
+              Products
+            </Link>
+            <Link
+              href="#"
+              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              prefetch={false}
+            >
+              Contact
+            </Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <form className="hidden md:flex gap-2">
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="max-w-[300px] text-sm"
+              />
+              <Button size="sm">Search</Button>
+            </form>
+            <Button variant="outline" size="sm">
+              Cart
+              <Badge className="ml-1">3</Badge>
+              <span className="sr-only">Cart</span>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-full"
+                >
+                  <Image
+                    src="/Images/watch.jpg"
+                    width="32"
+                    height="32"
+                    className="rounded-full"
+                    alt="Avatar"
+                    style={{ aspectRatio: "32/32", objectFit: "cover" }}
+                  />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-        <div>
-          <Button
-            variant="ghost"
-            className="hover:bg-blue-700 hover:text-white flex gap-2"
-            onClick={() => {}}
-          >
-            <CircleUserRound />
-            <span>Login</span>
-            <ChevronDown />
-          </Button>
-        </div>
-        <div className="flex gap-x-3">
-          <ShoppingCart /> <span>Cart</span>
-        </div>
-        <div className="flex gap-x-3">
-          <Package2 />
-          <span className="text-base">Become a seller</span>
-        </div>
-        <div>
-          <DotsVerticalIcon />
-        </div>
-      </div>
+      </header>
     </div>
   );
 };

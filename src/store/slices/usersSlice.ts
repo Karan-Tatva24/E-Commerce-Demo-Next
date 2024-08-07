@@ -15,8 +15,15 @@ import {
 } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const initialState: { user: UsersData | {} } = {
-  user: {},
+const initialState: { user: UsersData } = {
+  user: {
+    id: "",
+    username: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    isLoggedIn: false,
+  },
 };
 
 const findUserIndex = (id: string, users: UsersData[]) => {
@@ -182,7 +189,7 @@ export const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.fulfilled, (state) => {
-        state.user = {};
+        state.user = initialState.user;
       })
       .addCase(logInUser.fulfilled, (state, action) => {
         state.user = action.payload;

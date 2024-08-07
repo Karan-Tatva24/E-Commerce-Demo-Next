@@ -1,10 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import usersSlice from "./usersSlice";
+import usersReducer from "./usersSlice";
 import productCart from "./productCart";
+import productReducer from "./productSlice";
 
 export const rootReducer = combineReducers({
-  users: usersSlice,
+  users: usersReducer,
   productsCart: productCart,
+  products: productReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

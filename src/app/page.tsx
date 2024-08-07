@@ -1,10 +1,9 @@
-import ProductCard from "@/components/ProductCard";
-import ProductsRender from "@/components/ProductsRender";
+import ProductsRender from "@/components/products/ProductsRender";
 
-export default function Home() {
+export default function Home({ searchParams }: any) {
   return (
     <main className="flex flex-col items-center h-[calc(100% - 176px)]">
-      <ProductsRender />
+      <ProductsRender searchParams={searchParams} />
     </main>
   );
 }

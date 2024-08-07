@@ -7,11 +7,16 @@ const initialState = {
 
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
-  async (payload: { limit?: number; page: number }, { rejectWithValue }) => {
+  async (
+    payload: { limit?: number; page: number; search: string },
+    { rejectWithValue }
+  ) => {
     try {
       const skip = (payload.limit || 30) * (payload.page - 1);
       const response = await axios.get(
-        `https://dummyjson.com/products?limit=${payload.limit || 30}&skip=${skip}`
+        `https://dummyjson.com/products/search?limit=${
+          payload.limit || 30
+        }&skip=${skip}&q=${payload.search}`
       );
       return response.data;
     } catch (error: any) {

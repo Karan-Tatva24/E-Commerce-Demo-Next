@@ -2,33 +2,41 @@
 
 import { useAppDispatch } from "@/store/hooks";
 import { fetchProducts } from "@/store/slices/productSlice";
-import React, { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
-import Pagination from "./Pagination";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState, useCallback } from "react";
+import ProductCard from "@/components/products/ProductCard";
+import Pagination from "@/components/Pagination";
 import { Product } from "@/types/products";
 
-const ProductsRender = () => {
+interface SearchParams {
+  page?: string;
+  search?: string;
+}
+
+const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
   const limit = 30;
-  const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
+  const page = Number(searchParams?.page) || 1;
   const dispatch = useAppDispatch();
-  const params = useSearchParams();
 
-  useEffect(() => setPage(Number(params.get("page"))), [params]);
-
-  useEffect(() => {
-    dispatch(fetchProducts({ page })).then((res) => {
+  const fetchProductData = useCallback(async () => {
+    const res = await dispatch(
+      fetchProducts({ page, search: searchParams.search || "" })
+    );
+    if (res.payload) {
       setProducts(res.payload.products);
       setTotalProducts(res.payload.total);
-    });
-  }, [dispatch, page]);
+    }
+  }, [dispatch, page, searchParams.search]);
+
+  useEffect(() => {
+    fetchProductData();
+  }, [fetchProductData]);
 
   return (
     <>
       <div className="flex h-full justify-center items-center flex-wrap gap-4 pt-4">
-        {products.map((product, index) => (
+        {products.map((product) => (
           <ProductCard
             key={product.id}
             title={product.title}

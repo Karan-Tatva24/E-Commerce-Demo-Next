@@ -10,7 +10,7 @@ const Footer = () => {
             <Link href="/" className="font-medium" prefetch={false}>
               Home
             </Link>
-            <Link href="#" className="font-medium" prefetch={false}>
+            <Link href="/products" className="font-medium" prefetch={false}>
               Products
             </Link>
             <Link href="#" className="font-medium" prefetch={false}>

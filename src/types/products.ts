@@ -30,3 +30,10 @@ export interface Product {
   images: string[];
   thumbnail: string;
 }
+
+export interface CartState {
+  products: Product[];
+  quantity: { id: number; quantity: number }[];
+  totalProducts: number;
+  totalPrice: number;
+}

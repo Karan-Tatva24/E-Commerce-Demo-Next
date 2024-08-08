@@ -6,6 +6,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import Pagination from "@/components/Pagination";
 import { Product } from "@/types/products";
+import { addProduct } from "@/store/slices/productCartSlice";
+import { useToast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface SearchParams {
   page?: string;
@@ -18,6 +21,8 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
   const [totalProducts, setTotalProducts] = useState(0);
   const page = Number(searchParams?.page) || 1;
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
+  const router = useRouter();
 
   const fetchProductData = useCallback(async () => {
     const res = await dispatch(
@@ -33,17 +38,31 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
     fetchProductData();
   }, [fetchProductData]);
 
+  const handleAddToCart = (id: number) => {
+    dispatch(addProduct({ id })).then((response) => {
+      if (response.payload) {
+        toast({
+          title: "Success",
+          description: "Product successfully add to cart",
+        });
+        router.push("/cart");
+      }
+    });
+  };
+
   return (
     <>
       <div className="flex h-full justify-center items-center flex-wrap gap-4 pt-4">
         {products.map((product) => (
           <ProductCard
             key={product.id}
+            id={product.id}
             title={product.title}
             imageUrl={product.images[0]}
-            description={product.category}
+            description={product.description}
             price={product.price}
-            stock={product.stock}
+            rating={product.rating}
+            onAddToCart={handleAddToCart}
           />
         ))}
       </div>

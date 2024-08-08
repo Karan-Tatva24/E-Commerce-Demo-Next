@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PackageIcon } from "lucide-react";
+import { MenuIcon, PackageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/usersSlice";
@@ -21,12 +21,19 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { SearchSchema } from "@/schemas/searchSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useDebounceCallback } from "usehooks-ts";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
+  const [search, setSearch] = useState("");
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.root.users);
+  const { totalProducts } = useAppSelector((state) => state.root.productsCart);
+
+  const debounced = useDebounceCallback(setSearch, 1000);
 
   const form = useForm<z.infer<typeof SearchSchema>>({
     resolver: zodResolver(SearchSchema),
@@ -44,11 +51,13 @@ const Navbar = () => {
     router.push("/cart");
   };
 
+  useEffect(() => {
+    if (search !== "") router.push(`${pathname}?search=${search}`);
+    else router.push(`${pathname}`);
+  }, [pathname, router, search]);
+
   const onSubmit = (data: z.infer<typeof SearchSchema>) => {
-    if (data.search !== "")
-      router.push(`${pathname}?search=${data.search}`);
-    else 
-      router.push(`${pathname}`)
+    console.log(data.search);
   };
 
   return (
@@ -58,32 +67,11 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2" prefetch={false}>
               <PackageIcon className="h-6 w-6" />
-              <span className="font-semibold">DemoKart Inc.</span>
+              <span className="hidden md:block font-semibold">
+                DemoKart Inc.
+              </span>
             </Link>
           </div>
-          <nav className="hidden md:flex items-center gap-4">
-            <Link
-              href="/"
-              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              prefetch={false}
-            >
-              Home
-            </Link>
-            <Link
-              href="/products"
-              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              prefetch={false}
-            >
-              Products
-            </Link>
-            <Link
-              href="#"
-              className="font-medium text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              prefetch={false}
-            >
-              Contact
-            </Link>
-          </nav>
           <div className="flex items-center gap-4">
             <Form {...form}>
               <form
@@ -98,18 +86,19 @@ const Navbar = () => {
                       type="search"
                       placeholder="Search..."
                       {...field}
-                      className="max-w-[300px] text-sm"
+                      onChange={(e) => {
+                        field.onChange(e);
+                        debounced(e.target.value);
+                      }}
+                      className="max-w-[350px] text-sm"
                     />
                   )}
                 />
-                <Button type="submit" size="sm">
-                  Search
-                </Button>
               </form>
             </Form>
             <Button variant="outline" size="sm" onClick={handleCartClick}>
               Cart
-              <Badge className="ml-1">3</Badge>
+              <Badge className="ml-1">{totalProducts || 0}</Badge>
               <span className="sr-only">Cart</span>
             </Button>
             <DropdownMenu>
@@ -119,15 +108,13 @@ const Navbar = () => {
                   size="icon"
                   className="w-8 h-8 rounded-full"
                 >
-                  <Image
-                    src="/Images/watch.jpg"
-                    width="32"
-                    height="32"
-                    className="rounded-full"
-                    alt="Avatar"
-                    style={{ aspectRatio: "32/32", objectFit: "cover" }}
-                  />
-                  <span className="sr-only">Toggle user menu</span>
+                  <Avatar>
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="@shadcn"
+                    />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -141,9 +128,52 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-full"
+                >
+                  <MenuIcon className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel></DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Home</DropdownMenuItem>
+                <DropdownMenuItem>Product</DropdownMenuItem>
+                <DropdownMenuItem>Contact</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
+      <div className="pt-2 px-4">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex md:hidden gap-2"
+          >
+            <FormField
+              name="search"
+              control={form.control}
+              render={({ field }) => (
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    debounced(e.target.value);
+                  }}
+                  className="max-w-full text-sm"
+                />
+              )}
+            />
+          </form>
+        </Form>
+      </div>
     </div>
   );
 };

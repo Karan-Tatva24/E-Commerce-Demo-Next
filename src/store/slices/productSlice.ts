@@ -1,8 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Product } from "@/types/products";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const initialState = {
+const initialState: { products: Product[]; product: Product | null } = {
   products: [],
+  product: null,
 };
 
 export const fetchProducts = createAsyncThunk(
@@ -25,14 +27,39 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+export const fetchSingleProduct = createAsyncThunk(
+  "product/fetchSingleProduct",
+  async (payload: { id: number }, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `https://dummyjson.com/products/${payload.id}`
+      );
+      if (res.data) return res.data;
+      else throw new Error("Error while product data fetch");
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchProducts.fulfilled, (state, action) => {
-      state.products = action.payload;
-    });
+    builder
+      .addCase(
+        fetchProducts.fulfilled,
+        (state, action: PayloadAction<Product[]>) => {
+          state.products = action.payload;
+        }
+      )
+      .addCase(
+        fetchSingleProduct.fulfilled,
+        (state, action: PayloadAction<Product>) => {
+          state.product = action.payload;
+        }
+      );
   },
 });
 

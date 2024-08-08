@@ -2,23 +2,28 @@
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEventHandler } from "react";
 import ProductCardSkeleton from "./ProductCardSkeleton";
+import { Star } from "lucide-react";
 
 interface ProductCardProps {
+  id: number;
   title: string;
   description: string;
   price: number;
-  stock: number;
+  rating: number;
   imageUrl: string;
+  onAddToCart: (id: number) => void;
 }
 
 const ProductCard = ({
+  id,
   description,
   title,
   price,
   imageUrl,
-  stock,
+  rating,
+  onAddToCart,
 }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -27,6 +32,14 @@ const ProductCard = ({
     img.src = imageUrl;
     img.onload = () => setImageLoaded(true);
   }, [imageUrl]);
+
+  const ratingDisplay = (rating: number) => {
+    const stars = [];
+    for (let i = 0; i < Math.round(rating); i++) {
+      stars.push(<Star key={i} fill="yellow" strokeWidth={0.3} />);
+    }
+    return stars;
+  };
 
   return (
     <Card className="w-full h-full max-w-xs rounded-xl border">
@@ -53,13 +66,18 @@ const ProductCard = ({
               </h2>
               <div className="flex justify-between items-center">
                 <p className="font-semibold text-sm md:text-base">${price}</p>
-                <p className="font-semibold text-sm md:text-base">
-                  Available Stock: {stock}
-                </p>
+                <div className="flex items-center">{ratingDisplay(rating)}</div>
               </div>
-              <p className="text-sm md:text-base opacity-70">{description}</p>
+              <p className="text-sm md:text-base opacity-70 truncate">
+                {description}
+              </p>
             </div>
-            <Button size="sm">Add to cart</Button>
+            <div className="flex items-center justify-between">
+              <Button size="lg">Learn more</Button>
+              <Button size="lg" onClick={() => onAddToCart(id)}>
+                Add to cart
+              </Button>
+            </div>
           </>
         )}
       </div>

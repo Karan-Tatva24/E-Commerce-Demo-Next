@@ -2,9 +2,11 @@
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { useState, useEffect, MouseEventHandler } from "react";
+import { useState, useEffect } from "react";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { Star } from "lucide-react";
+import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: number;
@@ -26,6 +28,10 @@ const ProductCard = ({
   onAddToCart,
 }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { cart } = useAppSelector((state) => state.root.productsCart);
+
+  const isProductInCart = cart.findIndex((product) => product.id === id);
+  const route = useRouter();
 
   useEffect(() => {
     const img = new window.Image();
@@ -74,8 +80,15 @@ const ProductCard = ({
             </div>
             <div className="flex items-center justify-between">
               <Button size="lg">Learn more</Button>
-              <Button size="lg" onClick={() => onAddToCart(id)}>
-                Add to cart
+              <Button
+                size="lg"
+                onClick={() => {
+                  if (isProductInCart !== -1) route.push("/cart");
+                  else onAddToCart(id);
+                }}
+                variant={isProductInCart === -1 ? "outline" : "destructive"}
+              >
+                {isProductInCart !== -1 ? "Go to cart" : "Add to cart"}
               </Button>
             </div>
           </>

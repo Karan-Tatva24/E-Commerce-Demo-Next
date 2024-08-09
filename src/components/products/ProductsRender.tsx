@@ -8,7 +8,6 @@ import Pagination from "@/components/Pagination";
 import { Product } from "@/types/products";
 import { addProduct } from "@/store/slices/productCartSlice";
 import { useToast } from "../ui/use-toast";
-import { useRouter } from "next/navigation";
 
 interface SearchParams {
   page?: string;
@@ -22,7 +21,6 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
   const page = Number(searchParams?.page) || 1;
   const dispatch = useAppDispatch();
   const { toast } = useToast();
-  const router = useRouter();
 
   const fetchProductData = useCallback(async () => {
     const res = await dispatch(
@@ -40,12 +38,12 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
 
   const handleAddToCart = (id: number) => {
     dispatch(addProduct({ id })).then((response) => {
+      console.log({ response });
       if (response.payload) {
         toast({
           title: "Success",
           description: "Product successfully add to cart",
         });
-        router.push("/cart");
       }
     });
   };

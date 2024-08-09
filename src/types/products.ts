@@ -29,11 +29,9 @@ export interface Product {
   minimumOrderQuantity: number;
   images: string[];
   thumbnail: string;
+  quantity?: number;
 }
 
 export interface CartState {
-  products: Product[];
-  quantity: { id: number; quantity: number }[];
-  totalProducts: number;
-  totalPrice: number;
+  cart: Product[];
 }

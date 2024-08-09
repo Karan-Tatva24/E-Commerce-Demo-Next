@@ -31,7 +31,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.root.users);
-  const { totalProducts } = useAppSelector((state) => state.root.productsCart);
+  const { cart } = useAppSelector((state) => state.root.productsCart);
 
   const debounced = useDebounceCallback(setSearch, 1000);
 
@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <div className="flex flex-col min-w-full">
       <header className="border-b">
-        <div className="container flex items-center justify-between py-2 px-4 md:py-4 md:px-6">
+        <div className="flex items-center justify-between py-2 px-4 md:py-4 md:px-6">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2" prefetch={false}>
               <PackageIcon className="h-6 w-6" />
@@ -98,7 +98,7 @@ const Navbar = () => {
             </Form>
             <Button variant="outline" size="sm" onClick={handleCartClick}>
               Cart
-              <Badge className="ml-1">{totalProducts || 0}</Badge>
+              <Badge className="ml-1">{cart.length}</Badge>
               <span className="sr-only">Cart</span>
             </Button>
             <DropdownMenu>

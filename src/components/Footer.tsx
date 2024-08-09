@@ -5,18 +5,7 @@ const Footer = () => {
   return (
     <div className="bottom-0 min-w-full mt-4">
       <footer className="border-t bg-white">
-        <div className="container grid items-center justify-center gap-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr] md:py-6">
-          <nav className="flex items-center gap-4 justify-start text-gray-500 dark:text-gray-400">
-            <Link href="/" className="font-medium" prefetch={false}>
-              Home
-            </Link>
-            <Link href="/products" className="font-medium" prefetch={false}>
-              Products
-            </Link>
-            <Link href="#" className="font-medium" prefetch={false}>
-              Contact
-            </Link>
-          </nav>
+        <div className="flex items-center justify-center gap-4 py-4 text-sm md:py-6">
           <p className="flex items-center gap-2 text-center md:justify-self md:order-3">
             &copy; 2023 DemoKart Inc. All rights reserved.
           </p>

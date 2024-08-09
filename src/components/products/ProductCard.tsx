@@ -15,6 +15,7 @@ interface ProductCardProps {
   price: number;
   rating: number;
   imageUrl: string;
+  brand: string;
   onAddToCart: (id: number) => void;
 }
 
@@ -26,6 +27,7 @@ const ProductCard = ({
   imageUrl,
   rating,
   onAddToCart,
+  brand,
 }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { cart } = useAppSelector((state) => state.root.productsCart);
@@ -70,6 +72,7 @@ const ProductCard = ({
               <h2 className="font-semibold text-sm md:text-lg truncate">
                 {title}
               </h2>
+              <h3>({brand})</h3>
               <div className="flex justify-between items-center">
                 <p className="font-semibold text-sm md:text-base">${price}</p>
                 <div className="flex items-center">{ratingDisplay(rating)}</div>
@@ -79,7 +82,14 @@ const ProductCard = ({
               </p>
             </div>
             <div className="flex items-center justify-between">
-              <Button size="lg">Learn more</Button>
+              <Button
+                size="lg"
+                onClick={() => {
+                  route.push(`/product/${id}`);
+                }}
+              >
+                Learn more
+              </Button>
               <Button
                 size="lg"
                 onClick={() => {

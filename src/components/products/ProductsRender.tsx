@@ -60,6 +60,7 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
             description={product.description}
             price={product.price}
             rating={product.rating}
+            brand={product.brand}
             onAddToCart={handleAddToCart}
           />
         ))}

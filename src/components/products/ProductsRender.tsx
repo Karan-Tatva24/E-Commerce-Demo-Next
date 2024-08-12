@@ -1,13 +1,13 @@
 "use client";
 
 import { useAppDispatch } from "@/store/hooks";
-import { fetchProducts } from "@/store/slices/productSlice";
 import React, { useEffect, useState, useCallback } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import Pagination from "@/components/Pagination";
 import { Product } from "@/types/products";
 import { addProduct } from "@/store/slices/productCartSlice";
 import { useToast } from "../ui/use-toast";
+import axios from "axios";
 
 interface SearchParams {
   page?: string;
@@ -18,19 +18,24 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
   const limit = 30;
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
-  const page = Number(searchParams?.page) || 1;
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const search = searchParams.search || "";
+  const page = Number(searchParams.page) || 1;
 
   const fetchProductData = useCallback(async () => {
-    const res = await dispatch(
-      fetchProducts({ page, search: searchParams.search || "" })
+    const skip = (limit || 30) * (page - 1);
+    const res = await axios.get(
+      `https://dummyjson.com/products/search?limit=${
+        limit || 30
+      }&skip=${skip}&q=${search}`
     );
-    if (res.payload) {
-      setProducts(res.payload.products);
-      setTotalProducts(res.payload.total);
+
+    if (res.data) {
+      setProducts(res.data.products);
+      setTotalProducts(res.data.total);
     }
-  }, [dispatch, page, searchParams.search]);
+  }, [page, search]);
 
   useEffect(() => {
     fetchProductData();
@@ -61,6 +66,7 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
             price={product.price}
             rating={product.rating}
             brand={product.brand}
+            tags={product.tags}
             onAddToCart={handleAddToCart}
           />
         ))}

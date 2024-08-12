@@ -29,6 +29,7 @@ const SignIn = () => {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof SignInSchema>>({
+    defaultValues: { username: "", email: "", password: "" },
     resolver: zodResolver(SignInSchema),
   });
 
@@ -36,8 +37,7 @@ const SignIn = () => {
     setIsSubmitting(true);
     setErrorMessage("");
     try {
-      const response = dispatch(logInUser(data));
-      console.log("Response", response);
+      const response = await dispatch(logInUser(data));
       toast({
         title: "Success",
         description: "User register successfully",

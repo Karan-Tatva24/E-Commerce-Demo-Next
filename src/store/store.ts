@@ -1,45 +1,37 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { persistReducer, persistStore } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer, Persistor } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import { rootReducer } from "./slices";
 
-// const isClient = typeof window !== "undefined";
+interface StoreWithPersistor extends EnhancedStore {
+  __persistor?: Persistor;
+}
 
-// let store;
-// let persistor;
+const persistConfig = {
+  key: "root",
+  storage,
+};
 
-// if (isClient) {
-//   const persistConfig = {
-//     key: "root",
-//     storage,
-//   };
-
-//   const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-//   store = configureStore({
-//     reducer: {
-//       root: persistedReducer,
-//     },
-//     middleware: (getDefaultMiddleware) =>
-//       getDefaultMiddleware({
-//         serializableCheck: {
-//           ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
-//         },
-//       }),
-//   });
-
-//   persistor = persistStore(store);
-// } else {
- const store = configureStore({
-    reducer: {
-      root: rootReducer,
-    },
+const makeConfiguredStore = (): StoreWithPersistor => {
+  return configureStore({
+    reducer: rootReducer,
   });
+};
 
-  // persistor = null;
-// }
+export const makeStore = (): StoreWithPersistor => {
+  const isServer = typeof window === "undefined";
+  if (isServer) {
+    return makeConfiguredStore();
+  } else {
+    const persistedReducer = persistReducer(persistConfig, rootReducer);
+    const store: StoreWithPersistor = configureStore({
+      reducer: persistedReducer,
+    });
+    store.__persistor = persistStore(store);
+    return store;
+  }
+};
 
-export { store };
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof makeStore>;
+export type RootState = ReturnType<AppStore["getState"]>;
+export type AppDispatch = AppStore["dispatch"];

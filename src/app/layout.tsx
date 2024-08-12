@@ -5,6 +5,7 @@ import StoreProvider from "@/app/StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AuthRoutes from "@/app/AuthRoutes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +23,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-gray-100`}>
         <StoreProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <AuthRoutes>
+            <Navbar />
+            {children}
+            <Footer />
+          </AuthRoutes>
         </StoreProvider>
         <Toaster />
       </body>

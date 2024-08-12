@@ -5,17 +5,33 @@ import { Separator } from "@/components/ui/separator";
 import { CodeIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
+  checkoutOrder,
   decreaseQuantity,
   increaseQuantity,
+  removeProduct,
 } from "@/store/slices/productCartSlice";
 import { useToast } from "../ui/use-toast";
 import Image from "next/image";
 import EmptyCart from "../../../public/Images/empty-cart.jpg";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 export default function Component() {
-  const { cart } = useAppSelector((state) => state.root.productsCart);
+  const { cart } = useAppSelector((state) => state.productsCart);
+  const { user } = useAppSelector((state) => state.users);
   const { toast } = useToast();
   const dispatch = useAppDispatch();
+  const route = useRouter();
 
   const subtotal = cart.reduce(
     (total, product) => total + product.price * product.quantity!,
@@ -54,6 +70,31 @@ export default function Component() {
     );
   }
 
+  const handleRemoveProductToCart = (id: number) => {
+    dispatch(removeProduct({ id }));
+    toast({
+      title: "Success",
+      description: "Product remove from cart successfully",
+    });
+  };
+
+  const handleCheckout = () => {
+    if (!user.isLoggedIn) {
+      // route.push("/sign-in");
+      toast({
+        title: "Failed",
+        description: "Please sign in first",
+        variant: "destructive",
+      });
+    } else {
+      dispatch(checkoutOrder());
+      toast({
+        title: "Success",
+        description: "Order placed successfully",
+      });
+    }
+  };
+
   return (
     <div className="grid md:grid-cols-[1fr_300px] gap-8 px-4 md:px-6 py-12">
       <div>
@@ -86,7 +127,34 @@ export default function Component() {
                   <p className="text-muted-foreground font-semibold mb-2">
                     {product.shippingInformation}
                   </p>
-                  <p className="text-lg">${product.price.toFixed(2)}</p>
+                  <p className="text-lg mb-3">${product.price.toFixed(2)}</p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="text-lg text-red-400"
+                      >
+                        Remove
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Remove Item</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to remove this item?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleRemoveProductToCart(product.id)}
+                        >
+                          Remove
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -138,7 +206,7 @@ export default function Component() {
             <span>${total.toFixed(2)}</span>
           </div>
         </div>
-        <Button size="lg" className="w-full">
+        <Button size="lg" className="w-full" onClick={handleCheckout}>
           Proceed to Checkout
         </Button>
       </div>

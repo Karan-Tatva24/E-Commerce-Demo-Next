@@ -30,8 +30,8 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.root.users);
-  const { cart } = useAppSelector((state) => state.root.productsCart);
+  const { user } = useAppSelector((state) => state.users);
+  const { cart } = useAppSelector((state) => state.productsCart);
 
   const debounced = useDebounceCallback(setSearch, 1000);
 
@@ -51,9 +51,12 @@ const Navbar = () => {
     router.push("/cart");
   };
 
+  const handleLogin = () => {
+    router.push("/sign-in");
+  };
+
   useEffect(() => {
     if (search !== "") router.push(`${pathname}?search=${search}`);
-    else router.push(`${pathname}`);
   }, [pathname, router, search]);
 
   const onSubmit = (data: z.infer<typeof SearchSchema>) => {
@@ -98,54 +101,48 @@ const Navbar = () => {
             </Form>
             <Button variant="outline" size="sm" onClick={handleCartClick}>
               Cart
-              <Badge className="ml-1">{cart.length}</Badge>
+              <Badge variant="secondary" className="ml-1">
+                {cart.length}
+              </Badge>
               <span className="sr-only">Cart</span>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 rounded-full"
-                >
-                  <Avatar>
-                    <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="@shadcn"
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 rounded-full"
-                >
-                  <MenuIcon className="h-6 w-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel></DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Home</DropdownMenuItem>
-                <DropdownMenuItem>Product</DropdownMenuItem>
-                <DropdownMenuItem>Contact</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {user.isLoggedIn ? (
+              <>
+                <span>
+                  Welcome, <b>{user.username}</b>
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-8 h-8 rounded-full"
+                    >
+                      <Avatar>
+                        <AvatarImage
+                          src="https://github.com/shadcn.png"
+                          alt="@shadcn"
+                        />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button size="sm" onClick={handleLogin}>
+                SignIn
+              </Button>
+            )}
           </div>
         </div>
       </header>

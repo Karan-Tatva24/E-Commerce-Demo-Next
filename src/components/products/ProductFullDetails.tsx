@@ -5,11 +5,13 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Star } from "lucide-react";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/products";
-import { fetchSingleProduct } from "@/store/slices/productSlice";
 import PlaceholderImage from "../../../public/Images/placeholder.jpg";
+import { addProduct } from "@/store/slices/productCartSlice";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function ProductFullDetails({
   productId,
@@ -18,13 +20,22 @@ export default function ProductFullDetails({
 }) {
   const [productDetails, setProductDetails] = useState<Product>();
   const dispatch = useAppDispatch();
+  const { cart } = useAppSelector((state) => state.productsCart);
+  const route = useRouter();
+
+  const isProductInCart = cart.some(
+    (product) => product.id === productDetails?.id
+  );
 
   useEffect(() => {
     try {
-      dispatch(fetchSingleProduct({ id: productId })).then((res) => {
-        if (res.type === "product/fetchSingleProduct/fulfilled")
-          setProductDetails(res.payload);
-      });
+      const fetchProductDetails = async () => {
+        const res = await axios.get(
+          `https://dummyjson.com/products/${productId}`
+        );
+        setProductDetails(res.data);
+      };
+      fetchProductDetails();
     } catch (error: any) {
       console.log("Error :: fetching product details ", error.message);
     }
@@ -36,6 +47,10 @@ export default function ProductFullDetails({
       stars.push(<Star key={i} fill="yellow" strokeWidth={0.3} />);
     }
     return stars;
+  };
+
+  const handleAddToCart = async (id: number) => {
+    await dispatch(addProduct({ id }));
   };
 
   return (
@@ -63,7 +78,6 @@ export default function ProductFullDetails({
                 loading="lazy"
                 className="aspect-square object-cover"
               />
-              {/* <span className="sr-only">View Image 1</span> */}
             </button>
           ))}
         </div>
@@ -109,7 +123,17 @@ export default function ProductFullDetails({
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold">${productDetails?.price}</span>
-            <Button size="lg">Add to Cart</Button>
+            <Button
+              size="lg"
+              variant={isProductInCart ? "destructive" : "default"}
+              onClick={() => {
+                isProductInCart
+                  ? route.push("/cart")
+                  : handleAddToCart(productDetails?.id!);
+              }}
+            >
+              {isProductInCart ? "Go to Cart" : "Add to Cart"}
+            </Button>
           </div>
         </div>
         <Separator />
@@ -139,7 +163,9 @@ export default function ProductFullDetails({
                   <div className="grid gap-2">
                     <div className="flex justify-between items-center">
                       <h3 className="font-bold">{review.reviewerName}</h3>
-                      <h3 className="text-muted-foreground">{review.date}</h3>
+                      <h3 className="text-muted-foreground">
+                        {new Date(review.date).toLocaleDateString()}
+                      </h3>
                     </div>
                     <p>{review.comment}</p>
                   </div>

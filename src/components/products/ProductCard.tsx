@@ -16,6 +16,7 @@ interface ProductCardProps {
   rating: number;
   imageUrl: string;
   brand: string;
+  tags: string[];
   onAddToCart: (id: number) => void;
 }
 
@@ -28,9 +29,10 @@ const ProductCard = ({
   rating,
   onAddToCart,
   brand,
+  tags,
 }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { cart } = useAppSelector((state) => state.root.productsCart);
+  const { cart } = useAppSelector((state) => state.productsCart);
 
   const isProductInCart = cart.findIndex((product) => product.id === id);
   const route = useRouter();
@@ -72,7 +74,7 @@ const ProductCard = ({
               <h2 className="font-semibold text-sm md:text-lg truncate">
                 {title}
               </h2>
-              <h3>({brand})</h3>
+              <h3>{brand ? `(${brand})` : `(${tags[0]})`}</h3>
               <div className="flex justify-between items-center">
                 <p className="font-semibold text-sm md:text-base">${price}</p>
                 <div className="flex items-center">{ratingDisplay(rating)}</div>

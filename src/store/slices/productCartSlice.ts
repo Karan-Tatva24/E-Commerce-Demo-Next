@@ -57,6 +57,9 @@ export const productCart = createSlice({
         console.error("Product is out of stock");
       }
     },
+    checkoutOrder: (state) => {
+      state.cart = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -82,5 +85,9 @@ export const productCart = createSlice({
 });
 
 export default productCart.reducer;
-export const { removeProduct, increaseQuantity, decreaseQuantity } =
-  productCart.actions;
+export const {
+  removeProduct,
+  increaseQuantity,
+  decreaseQuantity,
+  checkoutOrder,
+} = productCart.actions;

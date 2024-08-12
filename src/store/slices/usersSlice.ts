@@ -3,16 +3,9 @@ import {
   RegisterUserPayload,
   LogInUserPayload,
   UpdateUserPayload,
-  ChangePasswordPayload,
-  ForgotPasswordPayload,
   LogoutPayload,
 } from "@/types/UsersData";
-import {
-  createAsyncThunk,
-  createSlice,
-  nanoid,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const initialState: { user: UsersData } = {
@@ -74,9 +67,8 @@ export const logInUser = createAsyncThunk(
       if (userIdx === -1)
         throw new Error("User not exists please register user");
 
-      const user = { ...data.users[userIdx], isLogin: true };
+      const user = { ...data.users[userIdx], isLoggedIn: true };
       data.users[userIdx].isLoggedIn = true;
-      console.log({ user, data });
       await axios.post("/api/register-user", data);
       return user;
     } catch (error: any) {
@@ -140,7 +132,7 @@ export const logout = createAsyncThunk(
       if (userIdx === -1)
         throw new Error("User not exists please register user");
 
-      const user = { ...data.users[userIdx], isLogin: false };
+      const user = { ...data.users[userIdx], isLoggedIn: false };
       data.users[userIdx].isLoggedIn = false;
       console.log({ user, data });
       await axios.post("/api/register-user", data);
@@ -154,38 +146,7 @@ export const logout = createAsyncThunk(
 export const usersSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {
-    // changePassword: (state, action: PayloadAction<ChangePasswordPayload>) => {
-    //   const index = findUserIndex(action.payload.id, data.users);
-    //   if (index !== -1) {
-    //     if (data.users[index].password === action.payload.currentPassword) {
-    //       data.users[index].password = action.payload.newPassword;
-    //       if ((state.user as UsersData).id === action.payload.id) {
-    //         (state.user as UsersData).password = action.payload.newPassword;
-    //         writeData(data);
-    //       }
-    //     } else {
-    //       throw new Error("Please enter the correct current password");
-    //     }
-    //   } else {
-    //     throw new Error("User not found");
-    //   }
-    // },
-    // forgotPassword: (state, action: PayloadAction<ForgotPasswordPayload>) => {
-    //   const index = data.users.findIndex(
-    //     (user) => user.email === action.payload.email
-    //   );
-    //   if (index !== -1) {
-    //     data.users[index].password = action.payload.password;
-    //     if ((state.user as UsersData).email === action.payload.email) {
-    //       (state.user as UsersData).password = action.payload.password;
-    //       writeData(data);
-    //     }
-    //   } else {
-    //     throw new Error("User with this email does not exist");
-    //   }
-    // },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.fulfilled, (state) => {

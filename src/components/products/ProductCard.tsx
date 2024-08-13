@@ -7,6 +7,7 @@ import ProductCardSkeleton from "./ProductCardSkeleton";
 import { Star } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface ProductCardProps {
   id: number;
@@ -34,7 +35,7 @@ const ProductCard = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const { cart } = useAppSelector((state) => state.productsCart);
 
-  const isProductInCart = cart.findIndex((product) => product.id === id);
+  const isProductInCart = cart.some((product) => product.id === id);
   const route = useRouter();
 
   useEffect(() => {
@@ -84,23 +85,18 @@ const ProductCard = ({
               </p>
             </div>
             <div className="flex items-center justify-between">
+              <Link href={`/product/${id}`}>
+                <Button size="lg">Learn more</Button>
+              </Link>
               <Button
                 size="lg"
                 onClick={() => {
-                  route.push(`/product/${id}`);
-                }}
-              >
-                Learn more
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => {
-                  if (isProductInCart !== -1) route.push("/cart");
+                  if (isProductInCart) route.push("/cart");
                   else onAddToCart(id);
                 }}
-                variant={isProductInCart === -1 ? "outline" : "destructive"}
+                variant={isProductInCart ? "outline" : "destructive"}
               >
-                {isProductInCart !== -1 ? "Go to cart" : "Add to cart"}
+                {isProductInCart ? "Go to cart" : "Add to cart"}
               </Button>
             </div>
           </>

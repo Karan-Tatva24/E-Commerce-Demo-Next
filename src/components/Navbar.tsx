@@ -51,10 +51,6 @@ const Navbar = () => {
     router.push("/cart");
   };
 
-  const handleLogin = () => {
-    router.push("/sign-in");
-  };
-
   useEffect(() => {
     if (search !== "") router.push(`${pathname}?search=${search}`);
   }, [pathname, router, search]);
@@ -139,9 +135,9 @@ const Navbar = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Button size="sm" onClick={handleLogin}>
-                SignIn
-              </Button>
+              <Link href={"/sign-in"}>
+                <Button size="sm">SignIn</Button>
+              </Link>
             )}
           </div>
         </div>

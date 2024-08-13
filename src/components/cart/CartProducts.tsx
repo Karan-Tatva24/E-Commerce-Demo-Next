@@ -179,11 +179,8 @@ export default function Component() {
         </div>
       </div>
       <div className="bg-muted/40 rounded-lg p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-start">
           <h2 className="text-lg font-semibold">Cart Summary</h2>
-          <Button size="icon" variant="outline">
-            <CodeIcon className="h-5 w-5" />
-          </Button>
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">

@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MenuIcon, PackageIcon } from "lucide-react";
+import { PackageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/usersSlice";
@@ -29,6 +29,7 @@ const Navbar = () => {
   const [search, setSearch] = useState("");
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.users);
   const { cart } = useAppSelector((state) => state.productsCart);
@@ -42,18 +43,21 @@ const Navbar = () => {
     },
   });
 
-  const handleLogout = () => {
-    dispatch(logout({ id: user.id }));
-    router.push("/sign-in");
-  };
-
-  const handleCartClick = () => {
-    router.push("/cart");
+  const handleLogout = async () => {
+    await dispatch(logout({ id: user.id }));
+    router.replace("/sign-in");
   };
 
   useEffect(() => {
-    if (search !== "") router.push(`${pathname}?search=${search}`);
-  }, [pathname, router, search]);
+    const query = new URLSearchParams(searchParams as any);
+    if (search !== "") {
+      query.set("search", search);
+      query.delete("page");
+    } else {
+      query.delete("search");
+    }
+    router.push(`${pathname}?${query.toString()}`);
+  }, [pathname, router, search, searchParams]);
 
   const onSubmit = (data: z.infer<typeof SearchSchema>) => {
     console.log(data.search);
@@ -95,13 +99,15 @@ const Navbar = () => {
                 />
               </form>
             </Form>
-            <Button variant="outline" size="sm" onClick={handleCartClick}>
-              Cart
-              <Badge variant="secondary" className="ml-1">
-                {cart.length}
-              </Badge>
-              <span className="sr-only">Cart</span>
-            </Button>
+            <Link href={"/cart"}>
+              <Button variant="outline" size="sm">
+                Cart
+                <Badge variant="secondary" className="ml-1">
+                  {cart.length}
+                </Badge>
+                <span className="sr-only">Cart</span>
+              </Button>
+            </Link>
             {user.isLoggedIn ? (
               <>
                 <span>

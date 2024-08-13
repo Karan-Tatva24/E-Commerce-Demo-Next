@@ -32,8 +32,9 @@ const HeroSection = () => {
                       src={carousel.image}
                       alt={carousel.title}
                       layout="fill"
-                      objectFit="fill"
+                      style={{ objectFit: "fill" }}
                       className="rounded-md"
+                      priority
                     />
                   </div>
                 </CardContent>

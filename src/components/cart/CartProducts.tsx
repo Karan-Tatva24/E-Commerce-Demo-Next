@@ -80,7 +80,7 @@ export default function Component() {
 
   const handleCheckout = () => {
     if (!user.isLoggedIn) {
-      // route.push("/sign-in");
+      route.push("/sign-in");
       toast({
         title: "Failed",
         description: "Please sign in first",

@@ -1,4 +1,9 @@
 import ProductFullDetails from "@/components/products/ProductFullDetails";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Product",
+};
 
 const page = ({ params }: { params: { id: string } }) => {
   return (

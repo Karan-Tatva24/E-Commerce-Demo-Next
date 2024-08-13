@@ -42,7 +42,7 @@ const SignIn = () => {
         title: "Success",
         description: "User register successfully",
       });
-      router.push("/");
+      router.replace("/");
     } catch (error: any) {
       setErrorMessage(error.message);
       toast({

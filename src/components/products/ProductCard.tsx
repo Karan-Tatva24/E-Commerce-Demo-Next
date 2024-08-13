@@ -1,6 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
 import ProductCardSkeleton from "./ProductCardSkeleton";

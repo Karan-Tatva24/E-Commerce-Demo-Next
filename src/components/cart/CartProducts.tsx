@@ -11,7 +11,7 @@ import {
   removeProduct,
 } from "@/store/slices/productCartSlice";
 import { useToast } from "../ui/use-toast";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import EmptyCart from "../../../public/Images/empty-cart.jpg";
 import {
   AlertDialog,

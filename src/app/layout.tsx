@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import StoreProvider from "@/app/StoreProvider";
+import StoreProvider from "@/providers/StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import AuthRoutes from "@/app/AuthRoutes";
+import AuthProvider from "@/providers/AuthProvider";
+import { ReactQueryClientProvider } from "@/providers/ReactQueryClientProvider";
 
 export const metadata: Metadata = {
   title: { template: "%s | Demo Kart", default: "Demo Kart" },
-  description: "The official Next.js Course Dashboard, built with App Router.",
+  description: "This is Demo Kart shopping web app create using Next JS",
   authors: [{ name: "Karan Sarvaiya" }, { name: "Tatvasoft" }],
   keywords: ["Next.js", "Demo Kart", "Javascript", "React", "E-Commerce"],
   referrer: "origin-when-cross-origin",
@@ -34,11 +35,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-gray-100`}>
         <StoreProvider>
-          <AuthRoutes>
-            <Navbar />
-            {children}
-            <Footer />
-          </AuthRoutes>
+          <ReactQueryClientProvider>
+            <AuthProvider>
+              <Navbar />
+              <main className="min-h-[calc(100% - 176px)]">{children}</main>
+              <Footer />
+            </AuthProvider>
+          </ReactQueryClientProvider>
         </StoreProvider>
         <Toaster />
       </body>

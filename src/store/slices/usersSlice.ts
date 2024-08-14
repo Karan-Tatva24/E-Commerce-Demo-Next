@@ -19,10 +19,6 @@ const initialState: { user: UsersData } = {
   },
 };
 
-const findUserIndex = (id: string, users: UsersData[]) => {
-  return users.findIndex((user) => user.id === id);
-};
-
 export const registerUser = createAsyncThunk(
   "users/registerUser",
   async (payload: RegisterUserPayload, { rejectWithValue }) => {

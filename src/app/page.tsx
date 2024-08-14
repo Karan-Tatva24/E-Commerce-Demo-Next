@@ -3,9 +3,9 @@ import ProductsRender from "@/components/products/ProductsRender";
 
 export default function Home({ searchParams }: any) {
   return (
-    <main className="flex flex-col items-center h-[calc(100% - 176px)]">
+    <div className="flex flex-col items-center">
       <HeroSection />
       <ProductsRender searchParams={searchParams} />
-    </main>
+    </div>
   );
 }

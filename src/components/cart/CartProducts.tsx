@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CodeIcon, MinusIcon, PlusIcon } from "lucide-react";
+import { MinusIcon, PlusIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   checkoutOrder,
@@ -25,6 +25,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { SHIPPING_COST, TAX_RATE } from "@/data/constants";
 
 export default function Component() {
   const { cart } = useAppSelector((state) => state.productsCart);
@@ -37,8 +38,8 @@ export default function Component() {
     (total, product) => total + product.price * product.quantity!,
     0
   );
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+  const tax = subtotal * TAX_RATE;
+  const total = subtotal + tax + SHIPPING_COST;
 
   const handleIncreaseQuantity = (id: number) => {
     dispatch(increaseQuantity({ id }));

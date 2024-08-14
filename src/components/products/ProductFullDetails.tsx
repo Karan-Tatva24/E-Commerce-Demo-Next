@@ -6,52 +6,67 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import Image from "next/legacy/image";
 import { Star } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Product } from "@/types/products";
 import PlaceholderImage from "../../../public/Images/placeholder.jpg";
 import { addProduct } from "@/store/slices/productCartSlice";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useToast } from "../ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { fetchSingleProductDetails } from "@/lib/api";
 
 export default function ProductFullDetails({
   productId,
 }: {
   productId: number;
 }) {
-  const [productDetails, setProductDetails] = useState<Product>();
   const dispatch = useAppDispatch();
   const { cart } = useAppSelector((state) => state.productsCart);
   const route = useRouter();
+  const { toast } = useToast();
+
+  const {
+    data: productDetails,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryFn: async () => fetchSingleProductDetails({ productId }),
+    queryKey: ["Product", productId],
+  });
 
   const isProductInCart = cart.some(
     (product) => product.id === productDetails?.id
   );
 
-  useEffect(() => {
-    try {
-      const fetchProductDetails = async () => {
-        const res = await axios.get(
-          `https://dummyjson.com/products/${productId}`
-        );
-        setProductDetails(res.data);
-      };
-      fetchProductDetails();
-    } catch (error: any) {
-      console.log("Error :: fetching product details ", error.message);
-    }
-  }, [dispatch, productId]);
-
-  const ratingDisplay = (rating: number) => {
+  const ratingDisplay = useCallback((rating: number) => {
     const stars = [];
     for (let i = 0; i < Math.round(rating); i++) {
       stars.push(<Star key={i} fill="yellow" strokeWidth={0.3} />);
     }
     return stars;
-  };
+  }, []);
 
-  const handleAddToCart = async (id: number) => {
-    await dispatch(addProduct({ id }));
-  };
+  const handleAddToCart = useCallback(
+    (id: number) => {
+      dispatch(addProduct({ id })).then((response) => {
+        if (response.payload) {
+          toast({
+            title: "Success",
+            description: "Product successfully added to cart",
+          });
+        }
+      });
+    },
+    [dispatch, toast]
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError || !productDetails) {
+    return <div>Error loading product details. Please try again later.</div>;
+  }
 
   return (
     <div className="grid md:grid-cols-2 gap-6 lg:gap-12 items-start max-w-6xl px-4 mx-auto py-6">

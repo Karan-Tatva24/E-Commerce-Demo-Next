@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const AuthRoutes = ({ children }: { children: React.ReactNode }) => {
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const { user } = useAppSelector((state) => state.users);
   const route = useRouter();
@@ -28,4 +28,4 @@ const AuthRoutes = ({ children }: { children: React.ReactNode }) => {
   return isAuth ? <>{children}</> : null;
 };
 
-export default AuthRoutes;
+export default AuthProvider;

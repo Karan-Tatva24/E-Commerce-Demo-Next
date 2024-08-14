@@ -1,13 +1,14 @@
 "use client";
 
 import { useAppDispatch } from "@/store/hooks";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import Pagination from "@/components/Pagination";
-import { Product } from "@/types/products";
 import { addProduct } from "@/store/slices/productCartSlice";
 import { useToast } from "../ui/use-toast";
-import axios from "axios";
+import { PRODUCT_LIMIT_PER_PAGE } from "@/data/constants";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllProducts } from "@/lib/api";
 
 interface SearchParams {
   page?: string;
@@ -15,48 +16,43 @@ interface SearchParams {
 }
 
 const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
-  const limit = 30;
-  const [products, setProducts] = useState<Product[]>([]);
-  const [totalProducts, setTotalProducts] = useState(0);
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const search = searchParams.search || "";
   const page = Number(searchParams.page) || 1;
 
-  const fetchProductData = useCallback(async () => {
-    const skip = (limit || 30) * (page - 1);
-    const res = await axios.get(
-      `https://dummyjson.com/products/search?limit=${
-        limit || 30
-      }&skip=${skip}&q=${search}`
-    );
+  const { data, isLoading, isError } = useQuery({
+    queryFn: async () => await fetchAllProducts({ page, search }),
+    queryKey: ["Products", page, search],
+  });
+  console.log({ data });
 
-    if (res.data) {
-      setProducts(res.data.products);
-      setTotalProducts(res.data.total);
-    }
-  }, [page, search]);
+  const handleAddToCart = useCallback(
+    (id: number) => {
+      dispatch(addProduct({ id })).then((response) => {
+        if (response.payload) {
+          toast({
+            title: "Success",
+            description: "Product successfully added to cart",
+          });
+        }
+      });
+    },
+    [dispatch, toast]
+  );
 
-  useEffect(() => {
-    fetchProductData();
-  }, [fetchProductData]);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  const handleAddToCart = (id: number) => {
-    dispatch(addProduct({ id })).then((response) => {
-      console.log({ response });
-      if (response.payload) {
-        toast({
-          title: "Success",
-          description: "Product successfully add to cart",
-        });
-      }
-    });
-  };
+  if (isError || !data) {
+    return <div>Error fetching products. Please try again later.</div>;
+  }
 
   return (
     <>
       <div className="flex h-full justify-center items-center flex-wrap gap-4 pt-4">
-        {products.map((product) => (
+        {data.products.map((product) => (
           <ProductCard
             key={product.id}
             id={product.id}
@@ -72,7 +68,9 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
         ))}
       </div>
       <div className="pt-4">
-        <Pagination totalPages={Math.ceil(totalProducts / limit)} />
+        <Pagination
+          totalPages={Math.ceil(data.total / PRODUCT_LIMIT_PER_PAGE)}
+        />
       </div>
     </>
   );

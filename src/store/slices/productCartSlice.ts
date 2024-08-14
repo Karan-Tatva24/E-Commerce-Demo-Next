@@ -1,6 +1,6 @@
+import { fetchSingleProductDetails } from "@/lib/api";
 import { CartState, Product } from "@/types/products";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 const initialState: CartState = {
   cart: [],
@@ -14,11 +14,8 @@ export const addProduct = createAsyncThunk(
   "product/addProduct",
   async (payload: { id: number }, { rejectWithValue }) => {
     try {
-      const res = await axios.get(
-        `https://dummyjson.com/products/${payload.id}`
-      );
-      if (res.data) return res.data;
-      else throw new Error("Error while fetching product data");
+      const res = await fetchSingleProductDetails({ productId: payload.id });
+      return res;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

@@ -130,7 +130,6 @@ export const logout = createAsyncThunk(
 
       const user = { ...data.users[userIdx], isLoggedIn: false };
       data.users[userIdx].isLoggedIn = false;
-      console.log({ user, data });
       await axios.post("/api/register-user", data);
       return user;
     } catch (error: any) {

@@ -37,8 +37,7 @@ const SignUpForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
     try {
-      const response = dispatch(registerUser(data));
-      console.log("Response", response);
+      await dispatch(registerUser(data));
       toast({
         title: "Success",
         description: "User register successfully",

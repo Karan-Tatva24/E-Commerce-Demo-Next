@@ -64,12 +64,12 @@ const ProductCard = ({
               alt={title}
               width="400"
               height="500"
-              className="aspect-[4/5] object-cover border w-full"
+              className="aspect-[4/5] object-cover border w-full rounded-xl"
               loading="lazy"
             />
           </div>
         )}
-        {imageLoaded && (
+        {
           <>
             <div className="grid gap-1.5">
               <h2 className="font-semibold text-sm md:text-lg truncate">
@@ -100,7 +100,7 @@ const ProductCard = ({
               </Button>
             </div>
           </>
-        )}
+        }
       </div>
     </Card>
   );

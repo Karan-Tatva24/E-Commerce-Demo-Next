@@ -58,9 +58,7 @@ const Navbar = () => {
     router.push(`${pathname}?${query.toString()}`);
   }, [pathname, router, search, searchParams]);
 
-  const onSubmit = (data: z.infer<typeof SearchSchema>) => {
-    console.log(data.search);
-  };
+  const onSubmit = (data: z.infer<typeof SearchSchema>) => {};
 
   return (
     <div className="flex flex-col min-w-full">

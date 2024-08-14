@@ -25,7 +25,6 @@ const ProductsRender = ({ searchParams }: { searchParams: SearchParams }) => {
     queryFn: async () => await fetchAllProducts({ page, search }),
     queryKey: ["Products", page, search],
   });
-  console.log({ data });
 
   const handleAddToCart = useCallback(
     (id: number) => {

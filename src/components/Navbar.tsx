@@ -52,7 +52,6 @@ const Navbar = () => {
     const query = new URLSearchParams(searchParams as any);
     if (search !== "") {
       query.set("search", search);
-      query.delete("page");
     } else {
       query.delete("search");
     }

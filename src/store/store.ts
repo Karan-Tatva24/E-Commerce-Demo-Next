@@ -1,37 +1,41 @@
-import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer, Persistor } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import { configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
 import { rootReducer } from "./slices";
+import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
-interface StoreWithPersistor extends EnhancedStore {
-  __persistor?: Persistor;
-}
+const createNoopStorage = () => {
+  return {
+    getItem() {
+      return Promise.resolve(null);
+    },
+    setItem(_key: string, value: number) {
+      return Promise.resolve(value);
+    },
+    removeItem() {
+      return Promise.resolve();
+    },
+  };
+};
+
+const storage =
+  typeof window !== "undefined"
+    ? createWebStorage("local")
+    : createNoopStorage();
 
 const persistConfig = {
-  key: "root",
-  storage,
+  key: "persist",
+  storage: storage,
 };
 
-const makeConfiguredStore = (): StoreWithPersistor => {
-  return configureStore({
-    reducer: rootReducer,
-  });
-};
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const makeStore = (): StoreWithPersistor => {
-  const isServer = typeof window === "undefined";
-  if (isServer) {
-    return makeConfiguredStore();
-  } else {
-    const persistedReducer = persistReducer(persistConfig, rootReducer);
-    const store: StoreWithPersistor = configureStore({
-      reducer: persistedReducer,
-    });
-    store.__persistor = persistStore(store);
-    return store;
-  }
-};
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
+});
 
-export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
+export const persistor = persistStore(store);
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

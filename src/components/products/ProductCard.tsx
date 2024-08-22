@@ -36,7 +36,7 @@ const ProductCard = ({
   const { cart } = useAppSelector((state) => state.productsCart);
 
   const isProductInCart = cart.some((product) => product.id === id);
-  const route = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     const img = new window.Image();
@@ -91,7 +91,7 @@ const ProductCard = ({
               <Button
                 size="lg"
                 onClick={() => {
-                  if (isProductInCart) route.push("/cart");
+                  if (isProductInCart) router.push("/cart");
                   else onAddToCart(id);
                 }}
                 variant={isProductInCart ? "outline" : "destructive"}

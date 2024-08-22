@@ -21,7 +21,7 @@ export default function ProductFullDetails({
 }) {
   const dispatch = useAppDispatch();
   const { cart } = useAppSelector((state) => state.productsCart);
-  const route = useRouter();
+  const router = useRouter();
   const { toast } = useToast();
 
   const {
@@ -142,7 +142,7 @@ export default function ProductFullDetails({
               variant={isProductInCart ? "destructive" : "default"}
               onClick={() => {
                 isProductInCart
-                  ? route.push("/cart")
+                  ? router.push("/cart")
                   : handleAddToCart(productDetails?.id!);
               }}
             >

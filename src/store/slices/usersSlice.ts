@@ -4,6 +4,7 @@ import {
   LogInUserPayload,
   UpdateUserPayload,
   LogoutPayload,
+  PlaceOrderPayload,
 } from "@/types/UsersData";
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -16,6 +17,7 @@ const initialState: { user: UsersData } = {
     phoneNumber: "",
     password: "",
     isLoggedIn: false,
+    orders: [],
   },
 };
 
@@ -37,6 +39,7 @@ export const registerUser = createAsyncThunk(
         phoneNumber: payload.phoneNumber,
         password: payload.password,
         isLoggedIn: false,
+        orders: [],
       };
 
       data.users.push(newUser);
@@ -138,6 +141,37 @@ export const logout = createAsyncThunk(
   }
 );
 
+export const placeOrder = createAsyncThunk(
+  "users/placeOrder",
+  async (payload: PlaceOrderPayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("/api/register-user");
+      const data = response.data as { users: UsersData[] };
+
+      const newOrder = {
+        id: nanoid(4),
+        date: payload.date,
+        orderValue: payload.orderValue,
+      };
+
+      const userIdx = data.users.findIndex(
+        (user) => user.id === payload.userId
+      );
+
+      if (userIdx === -1)
+        throw new Error("User not exists please register user");
+
+      if (data.users[userIdx].isLoggedIn) {
+        data.users[userIdx].orders.push(newOrder);
+        await axios.post("/api/register-user", data);
+        return newOrder;
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const usersSlice = createSlice({
   name: "users",
   initialState,
@@ -155,6 +189,9 @@ export const usersSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state, action) => {
         state.user = action.payload;
+      })
+      .addCase(placeOrder.fulfilled, (state, action) => {
+        if (action.payload) state.user.orders.push(action.payload);
       });
   },
 });

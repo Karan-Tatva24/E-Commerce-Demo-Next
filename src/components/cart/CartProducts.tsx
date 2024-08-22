@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
-  checkoutOrder,
   decreaseQuantity,
   increaseQuantity,
   removeProduct,
@@ -26,20 +25,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { SHIPPING_COST, TAX_RATE } from "@/data/constants";
+import { generateBill } from "@/lib/utils";
 
 export default function Component() {
   const { cart } = useAppSelector((state) => state.productsCart);
   const { user } = useAppSelector((state) => state.users);
   const { toast } = useToast();
   const dispatch = useAppDispatch();
-  const route = useRouter();
+  const router = useRouter();
 
-  const subtotal = cart.reduce(
-    (total, product) => total + product.price * product.quantity!,
-    0
-  );
-  const tax = subtotal * TAX_RATE;
-  const total = subtotal + tax + SHIPPING_COST;
+  const { tax, subtotal, total } = generateBill(cart);
 
   const handleIncreaseQuantity = (id: number) => {
     dispatch(increaseQuantity({ id }));
@@ -81,19 +76,13 @@ export default function Component() {
 
   const handleCheckout = () => {
     if (!user.isLoggedIn) {
-      route.push("/sign-in");
+      router.push("/sign-in");
       toast({
         title: "Failed",
         description: "Please sign in first",
         variant: "destructive",
       });
-    } else {
-      dispatch(checkoutOrder());
-      toast({
-        title: "Success",
-        description: "Order placed successfully",
-      });
-    }
+    } else router.push("/checkout");
   };
 
   return (
@@ -192,7 +181,13 @@ export default function Component() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Shipping</span>
-            <span className="text-green-600">Free</span>
+            <span>
+              {SHIPPING_COST === 0 ? (
+                <span className="text-green-600">Free</span>
+              ) : (
+                SHIPPING_COST
+              )}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Tax</span>

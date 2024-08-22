@@ -1,8 +1,10 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { SHIPPING_COST, TAX_RATE } from "@/data/constants";
+import { Product } from "@/types/products";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
@@ -28,3 +30,13 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+export function generateBill(cartItems: Product[]) {
+  const subtotal = cartItems.reduce(
+    (total, product) => total + product.price * product.quantity!,
+    0
+  );
+  const tax = subtotal * TAX_RATE;
+  const total = subtotal + tax + SHIPPING_COST;
+  return { tax, subtotal, total };
+}

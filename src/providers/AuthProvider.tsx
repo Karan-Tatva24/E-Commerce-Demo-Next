@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const { user } = useAppSelector((state) => state.users);
-  const route = useRouter();
+  const router = useRouter();
   const [isAuth, setIsAuth] = useState(true);
 
   useEffect(() => {
@@ -17,13 +17,19 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user.isLoggedIn
       ) {
         setIsAuth(false);
-        route.push("/");
+        router.push("/");
+      } else if (
+        (pathname.startsWith("/profile") || pathname.startsWith("/order")) &&
+        !user.isLoggedIn
+      ) {
+        setIsAuth(false);
+        router.replace("/sign-in");
       } else {
         setIsAuth(true);
       }
     };
     isProtected();
-  }, [pathname, route, user.isLoggedIn]);
+  }, [pathname, router, user.isLoggedIn]);
 
   return isAuth ? <>{children}</> : null;
 };

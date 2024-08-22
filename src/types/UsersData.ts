@@ -1,3 +1,9 @@
+export interface Order {
+  id: string;
+  date: Date;
+  orderValue: number;
+}
+
 export interface UsersData {
   id: string;
   username: string;
@@ -5,6 +11,7 @@ export interface UsersData {
   phoneNumber: string;
   password: string;
   isLoggedIn: boolean;
+  orders: Order[];
 }
 
 export interface RegisterUserPayload {
@@ -37,4 +44,10 @@ export interface ForgotPasswordPayload {
 
 export interface LogoutPayload {
   id: string;
+}
+
+export interface PlaceOrderPayload {
+  userId: string;
+  date: Date;
+  orderValue: number;
 }

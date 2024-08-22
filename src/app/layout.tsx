@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/providers/AuthProvider";
 import { ReactQueryClientProvider } from "@/providers/ReactQueryClientProvider";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {
   title: { template: "%s | Demo Kart", default: "Demo Kart" },
@@ -37,9 +38,7 @@ export default function RootLayout({
         <StoreProvider>
           <ReactQueryClientProvider>
             <AuthProvider>
-              <Navbar />
-              <main className="min-h-[calc(100% - 176px)]">{children}</main>
-              <Footer />
+              <LayoutWrapper>{children}</LayoutWrapper>
             </AuthProvider>
           </ReactQueryClientProvider>
         </StoreProvider>

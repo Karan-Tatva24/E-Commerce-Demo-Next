@@ -52,6 +52,7 @@ export const productCart = createSlice({
         state.cart[productIndex].quantity! += 1;
       } else {
         console.error("Product is out of stock");
+        throw new Error("Product is out of stock");
       }
     },
     checkoutOrder: (state) => {

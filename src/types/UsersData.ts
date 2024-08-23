@@ -1,7 +1,16 @@
+import { Product } from "./products";
+
+export type PaymentMethod = "UPI" | "Credit Card";
+export type DeliveryStatus = "Delivered" | "Pending" | "Shipping";
+
 export interface Order {
   id: string;
   date: Date;
   orderValue: number;
+  items: Product[];
+  shippingAddress: string;
+  deliveryStatus: DeliveryStatus;
+  paymentMethod: PaymentMethod;
 }
 
 export interface UsersData {
@@ -50,4 +59,8 @@ export interface PlaceOrderPayload {
   userId: string;
   date: Date;
   orderValue: number;
+  items: Product[];
+  shippingAddress: string;
+  deliveryStatus: "Delivered" | "Pending" | "Shipping";
+  paymentMethod: "UPI" | "Credit Card";
 }

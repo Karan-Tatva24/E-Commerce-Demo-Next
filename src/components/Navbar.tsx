@@ -62,7 +62,7 @@ const Navbar = () => {
 
   return (
     <div className="flex flex-col min-w-full">
-      <header className="border-b">
+      <header className="fixed top-0 z-50 bg-white border-b min-w-full">
         <div className="flex items-center justify-between py-2 px-4 md:py-4 md:px-6">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2" prefetch={false}>
@@ -148,12 +148,9 @@ const Navbar = () => {
           </div>
         </div>
       </header>
-      <div className="pt-2 px-4">
+      <div className="px-4 mt-20 flex md:hidden min-w-full">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex md:hidden gap-2"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="min-w-full">
             <FormField
               name="search"
               control={form.control}

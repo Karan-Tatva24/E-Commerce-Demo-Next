@@ -7,11 +7,7 @@ export const metadata: Metadata = {
 };
 
 const Cart = () => {
-  return (
-    <div>
-      <CartProducts />
-    </div>
-  );
+  return <CartProducts />;
 };
 
 export default Cart;

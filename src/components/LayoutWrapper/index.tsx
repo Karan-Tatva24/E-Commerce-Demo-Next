@@ -23,7 +23,7 @@ const LayoutWrapper = ({
   return (
     <>
       <Navbar />
-      <main className="min-h-[calc(100% - 176px)]">{children}</main>
+      <main className="min-h-[780px] mt-8 md:mt-20">{children}</main>
       <Footer />
     </>
   );

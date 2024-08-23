@@ -37,11 +37,19 @@ export default function Component() {
   const { tax, subtotal, total } = generateBill(cart);
 
   const handleIncreaseQuantity = (id: number) => {
-    dispatch(increaseQuantity({ id }));
-    toast({
-      title: "Success",
-      description: "Add product successfully",
-    });
+    try {
+      dispatch(increaseQuantity({ id }));
+      toast({
+        title: "Success",
+        description: "Add product successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Product out of stock.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDecreaseQuantity = (id: number) => {

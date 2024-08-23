@@ -152,6 +152,10 @@ export const placeOrder = createAsyncThunk(
         id: nanoid(4),
         date: payload.date,
         orderValue: payload.orderValue,
+        items: payload.items,
+        shippingAddress: payload.shippingAddress,
+        deliveryStatus: payload.deliveryStatus,
+        paymentMethod: payload.paymentMethod,
       };
 
       const userIdx = data.users.findIndex(

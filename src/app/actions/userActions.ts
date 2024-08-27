@@ -5,21 +5,32 @@ import {
   RegisterUserPayload,
   UpdateUserPayload,
   PlaceOrderPayload,
+  ChangePasswordPayload,
+  LogInUserPayload,
 } from "@/types/UsersData";
 import { promises as fs } from "fs";
 import { revalidatePath } from "next/cache";
 import { nanoid } from "@reduxjs/toolkit";
 
 const filePath = "D:\\NextJsFolder\\e-commerce-users.json";
-// const filePath = "D:\\Learn MERN\\NextJsLearnProjects\\e-commerce-users.json";
 
 const readFile = async (): Promise<{ users: UsersData[] }> => {
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile(filePath, "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Error reading file:", error);
+    throw new Error("Failed to read users data.");
+  }
 };
 
 const writeFile = async (data: { users: UsersData[] }) => {
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  try {
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  } catch (error) {
+    console.error("Error writing file:", error);
+    throw new Error("Failed to write users data.");
+  }
 };
 
 export const registerUserAction = async (
@@ -27,8 +38,8 @@ export const registerUserAction = async (
 ): Promise<UsersData> => {
   const data = await readFile();
 
-  if (data.users.find((user) => user.email === payload.email)) {
-    throw new Error("User exists with this email");
+  if (data.users.some((user) => user.email === payload.email)) {
+    throw new Error("A user with this email already exists.");
   }
 
   const newUser: UsersData = {
@@ -47,17 +58,24 @@ export const registerUserAction = async (
   return newUser;
 };
 
-export const logInUserAction = async (payload: {
-  email: string;
-  password: string;
-}): Promise<UsersData> => {
+export const logInUserAction = async (
+  payload: LogInUserPayload
+): Promise<UsersData> => {
   const data = await readFile();
-  const userIdx = data.users.findIndex((user) => user.email === payload.email);
+  const user = data.users.find((user) => user.email === payload.email);
 
-  if (userIdx === -1) throw new Error("User does not exist. Please register.");
+  if (!user) {
+    throw new Error("User does not exist. Please register.");
+  }
 
-  const user = { ...data.users[userIdx], isLoggedIn: true };
-  data.users[userIdx].isLoggedIn = true;
+  if (
+    user.password !== payload.password ||
+    user.username !== payload.username
+  ) {
+    throw new Error("Invalid credentials. Please try again.");
+  }
+
+  user.isLoggedIn = true;
   await writeFile({ users: data.users });
   revalidatePath("/");
   return user;
@@ -69,33 +87,50 @@ export const updateUserAction = async (
   const data = await readFile();
   const userIdx = data.users.findIndex((user) => user.email === payload.email);
 
-  if (userIdx === -1) throw new Error("User does not exist. Please register.");
+  if (userIdx === -1) {
+    throw new Error("User does not exist. Please register.");
+  }
 
-  const updatedUser = { ...data.users[userIdx], ...payload };
+  const updatedUser: UsersData = { ...data.users[userIdx], ...payload };
   data.users[userIdx] = updatedUser;
   await writeFile({ users: data.users });
-  revalidatePath("/");
+  revalidatePath("/profile");
   return updatedUser;
 };
 
-export const deleteUserAction = async (id: string): Promise<void> => {
+export const changePasswordAction = async (
+  payload: ChangePasswordPayload
+): Promise<UsersData> => {
   const data = await readFile();
-  data.users = data.users.filter((user) => user.id !== id);
+  const userIdx = data.users.findIndex((user) => user.id === payload.id);
+
+  if (userIdx === -1) throw new Error("User does not exists. Please register");
+
+  if (data.users[userIdx].password !== payload.oldPassword)
+    throw new Error("Please enter correct current password");
+
+  const updatedUser: UsersData = {
+    ...data.users[userIdx],
+    password: payload.newPassword,
+  };
+  data.users[userIdx] = updatedUser;
   await writeFile({ users: data.users });
-  revalidatePath("/");
+  revalidatePath("/profile");
+  return updatedUser;
 };
 
 export const logoutAction = async (id: string): Promise<UsersData> => {
   const data = await readFile();
   const userIdx = data.users.findIndex((user) => user.id === id);
 
-  if (userIdx === -1) throw new Error("User does not exist. Please register.");
+  if (userIdx === -1) {
+    throw new Error("User does not exist. Please register.");
+  }
 
-  const user = { ...data.users[userIdx], isLoggedIn: false };
   data.users[userIdx].isLoggedIn = false;
   await writeFile({ users: data.users });
   revalidatePath("/");
-  return user;
+  return data.users[userIdx];
 };
 
 export const placeOrderAction = async (
@@ -104,7 +139,9 @@ export const placeOrderAction = async (
   const data = await readFile();
   const userIdx = data.users.findIndex((user) => user.id === payload.userId);
 
-  if (userIdx === -1) throw new Error("User does not exist. Please register.");
+  if (userIdx === -1) {
+    throw new Error("User does not exist. Please register.");
+  }
 
   const newOrder = {
     id: nanoid(4),

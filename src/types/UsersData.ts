@@ -42,7 +42,7 @@ export interface UpdateUserPayload extends Partial<UsersData> {
 
 export interface ChangePasswordPayload {
   id: string;
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
 }
 

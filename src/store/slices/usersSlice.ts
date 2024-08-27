@@ -3,9 +3,9 @@ import {
   registerUserAction,
   logInUserAction,
   updateUserAction,
-  deleteUserAction,
   logoutAction,
   placeOrderAction,
+  changePasswordAction,
 } from "@/app/actions/userActions";
 import {
   UsersData,
@@ -13,6 +13,7 @@ import {
   LogInUserPayload,
   UpdateUserPayload,
   PlaceOrderPayload,
+  ChangePasswordPayload,
 } from "@/types/UsersData";
 
 const initialState: { user: UsersData } = {
@@ -63,12 +64,12 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const deleteUser = createAsyncThunk(
-  "users/deleteUser",
-  async (payload: { id: string }, { rejectWithValue }) => {
+export const changePassword = createAsyncThunk(
+  "users/changePassword",
+  async (payload: ChangePasswordPayload, { rejectWithValue }) => {
     try {
-      await deleteUserAction(payload.id);
-      return null;
+      const changePassword = await changePasswordAction(payload);
+      return changePassword;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -112,6 +113,9 @@ export const usersSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
+        state.user = action.payload!;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
         state.user = action.payload!;
       })
       .addCase(logout.fulfilled, (state, action) => {

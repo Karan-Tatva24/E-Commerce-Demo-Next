@@ -3,7 +3,7 @@ import { Order } from "@/types/UsersData";
 import React from "react";
 
 const Table = ({ order }: { order: Order }) => {
-  const { total } = generateBill(order.items);
+  const { total, tax } = generateBill(order.items);
   return (
     <table className="w-full">
       <thead className="bg-gray-300 dark:bg-gray-800">
@@ -36,8 +36,17 @@ const Table = ({ order }: { order: Order }) => {
           </tr>
         ))}
         <tr>
-          <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400 col-span-4">
-            <span className="font-bold">Total Bill:</span> ${total.toFixed(2)}
+          <td className="px-4 py-3 text-sm font-medium">Tax</td>
+          <td className="px-4 py-3 text-right">-</td>
+          <td className="px-4 py-3 text-right">-</td>
+          <td className="px-4 py-3 text-right">{tax.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td className="px-4 py-3 text-left">
+            <span className="font-bold">Total</span>
+          </td>
+          <td colSpan={3} className="px-4 py-3 text-right text-black">
+            <span className="font-bold">{total.toFixed(2)}</span>
           </td>
         </tr>
       </tbody>

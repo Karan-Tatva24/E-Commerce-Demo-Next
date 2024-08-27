@@ -37,23 +37,23 @@ const SignInForm = () => {
   const onSubmit = async (data: z.infer<typeof SignInSchema>) => {
     setIsSubmitting(true);
     setErrorMessage("");
-    try {
-      await dispatch(logInUser(data));
-      toast({
-        title: "Success",
-        description: "User register successfully",
-      });
-      router.replace("/");
-    } catch (error: any) {
-      setErrorMessage(error.message);
-      toast({
-        title: "Error",
-        description: error.message || "User not register",
-        variant: "destructive",
-      });
-    } finally {
+    await dispatch(logInUser(data)).then((res) => {
+      if (res.type === "users/loginUser/fulfilled") {
+        toast({
+          title: "Success",
+          description: "User register successfully",
+        });
+        router.replace("/");
+      } else if (res.type === "users/loginUser/rejected") {
+        setErrorMessage("Incorrect username or password");
+        toast({
+          title: "Error",
+          description: "Incorrect username or password",
+          variant: "destructive",
+        });
+      }
       setIsSubmitting(false);
-    }
+    });
   };
 
   return (

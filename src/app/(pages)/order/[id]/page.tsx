@@ -1,8 +1,11 @@
 "use client";
 
-import Table from "@/components/order/table";
+import Table from "@/components/order/Table";
+import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/hooks";
 import React from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const OrderPage = ({ params }: { params: { id: string } }) => {
   const { user } = useAppSelector((state) => state.users);
@@ -16,9 +19,41 @@ const OrderPage = ({ params }: { params: { id: string } }) => {
   }
   const order = user.orders[orderIndex];
 
+  const handleDownloadPdf = async () => {
+    try {
+      const input = document.getElementById("bill-content");
+
+      if (input) {
+        const canvas = await html2canvas(input, { scale: 2 });
+        const imgData = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF("l", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+        const pdfHeight = ((canvas.height * pdfWidth) / canvas.width);
+
+        let heightLeft = pdfHeight;
+        let position = 10;
+
+        pdf.addImage(imgData, "PNG", 10, position, pdfWidth, pdfHeight);
+        heightLeft -= pdf.internal.pageSize.getHeight();
+
+        while (heightLeft > 0) {
+          position = heightLeft - pdfHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pdf.internal.pageSize.getHeight();
+        }
+
+        pdf.save(`OrderBill_${params.id}.pdf`);
+      }
+    } catch (error) {
+      console.error("Failed to download the PDF:", error);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 md:px-6">
-      <div className="grid gap-8">
+      <div id="bill-content" className="grid gap-8">
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Order #{params.id}</h1>
@@ -53,7 +88,7 @@ const OrderPage = ({ params }: { params: { id: string } }) => {
             <div>
               <h3 className="text-lg font-medium">Payment Method</h3>
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                Visa ending in 1234
+                {order.paymentMethod}
               </div>
             </div>
             <div>
@@ -79,7 +114,7 @@ const OrderPage = ({ params }: { params: { id: string } }) => {
                 {user.email}
               </div>
             </div>
-            <div>
+            <div className="mb-4">
               <h3 className="text-lg font-medium">Customer Phone</h3>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {user.phoneNumber}
@@ -87,6 +122,9 @@ const OrderPage = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="text-center">
+        <Button onClick={handleDownloadPdf}>Download Bill</Button>
       </div>
     </div>
   );
